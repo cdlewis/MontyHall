@@ -87,7 +87,6 @@ $( document ).ready( function() {
 		// Start monitoring
 		$( "#progress_indicator" ).css( "display", "block" );
 		PROGRESS_ID = setInterval( function() {
-		console.log( 'progress' );
 			if( NUMBER_OF_SIMULATIONS < MAX_SIMULATIONS )
 				$( "#progress_bar" ).css( "width", ( NUMBER_OF_SIMULATIONS / MAX_SIMULATIONS * 100 ) + "%" );
 			else
