@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <title>Monty Hall Problem</title>
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/main.js"></script>
+		<style type="text/css">.separator { margin: 40px 0 39px; }</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Monty Hall Problem</h1>
+			<h3>Description</h3>
+			<p>'Suppose you're on a game show, and you're given the choice of three doors: Behind one door is a car; behind the others, goats. You pick a door, say No. 1, and the host, who knows what's behind the doors, opens another door, say No. 3, which has a goat. He then says to you, "Do you want to pick door No. 2?" Is it to your advantage to switch your choice?'</p>
+			<p>The name 'Monty Hall' comes from the original host of the game show <i>Let's Make a Deal</i>.</p>
+			<h3>Theory</h3>
+			<p>The contestant should switch to the other door as it has a ⅔ chance of containing the car whereas the original door has only a ⅓ chance.</p>
+			<p>The only time that switching will disadvantage the player is when he initially picked the door with the car. This will only happen ⅓ of the time. Therefore switching will be the optimal strategy ⅔ of the time.</p>
+			<h3>Test</h3>
+			<form>
+				<fieldset>
+					<label for="game_num">Number of games</label>
+					<input type="text" value="5000" id="game_num" />
+					<label class="checkbox" for="switch">
+						<input type="checkbox" checked="checked" id="switch"> Switch?
+					</label>
+					<button type="submit" class="btn" id="start_test">Start</button>
+				</fieldset>
+			</form>
+			<div class="progress progress-striped active" id="progress_indicator" style="display: none;">
+				<div class="bar" style="width: 0%;" id="progress_bar"></div>
+			</div>
+			<h3>Results</h3>
+			<table class="table table-striped" id="results">
+				<tr><th>Games</th><th>Switch after Reveal</th><th>Player Wins</th></tr>
+			</table>
+		</div>
+	</body>
+</html>
