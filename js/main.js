@@ -5,12 +5,22 @@ function aRand( min, max )
 	return Math.floor( Math.random() * ( 1 + max - min ) ) + min;
 }
 
-function shuffle(o){
-for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-return o;
+function shuffle( o )
+{
+	for( var j, x, i = o.length; i; j = Math.floor( Math.random() * i ), x = o[ --i ], o[ i ] = o[ j ], o[ j ] = x );
+	return o;
+};
+
+String.prototype.format = function() {
+	var args = arguments;
+	return this.replace( /{(\d+)}/g, function( match, number )
+	{ 
+		return typeof args[number] != 'undefined' ? args[number] : match;
+	} );
 };
 
 // Constants
+
 var CAR = 'CAR';
 var GOAT = 'GOAT';
 
@@ -20,18 +30,18 @@ var stage_combinations = [
 	[ GOAT, GOAT, CAR ]
 ];
 
+// Game
+
 function montyhall( switch_door )
 {
 	var doors = stage_combinations[ aRand( 0, 2 ) ];
 	var free_doors = shuffle( [ 0, 1, 2 ] );
 
-	// Player guess
 	var player_guess = free_doors.pop();
 
-	// Do we switch doors?
 	if( switch_door )
 	{
-		// Check which one to reveal
+		// Reveal the first remaining door unless it's the car
 		var host_reveal = free_doors.pop();
 		if( doors[ host_reveal ] == CAR )
 		{
@@ -39,19 +49,14 @@ function montyhall( switch_door )
 			host_reveal == free_doors.shift();
 		}
 
-		// Switch doors and return outcome
+		// Change player guess to the final remaining door
 		return ( doors[ free_doors.pop() ] == CAR );		
 	}
 	else
 		return ( doors[ player_guess ] == CAR );
 }
 
-var NUMBER_OF_SIMULATIONS = 0;
-var MAX_SIMULATIONS = 0;
-var CORRECT_GUESSES = 0;
-var SIMULATION_ID = 0;
-var PROGRESS_ID = 0;
-var SWITCH = true;
+// UI
 
 $( document ).ready( function() {
 	$( "#start_test" ).click( function( event ) {
@@ -59,27 +64,32 @@ $( document ).ready( function() {
 		$( "#start_test" ).attr( "disabled", "true" ); // prevent multiple clicks
 		
 		// Setup simulation variables
-		NUMBER_OF_SIMULATIONS = 0;
-		CORRECT_GUESSES = 0;
-		SWITCH = $( "#switch" ).is( ":checked" );
-		MAX_SIMULATIONS = parseInt( $( "#game_num" ).val() );
-		if( MAX_SIMULATIONS == NaN ) // default to 10 games for invalid input
+		correct_guesses = 0;
+		switch_door = $( "#switch" ).is( ":checked" );
+		max_games = parseInt( $( "#game_num" ).val() );
+		if( max_games == NaN ) // default to 10 games for invalid input
 		{
 			$( "#game_num" ).attr( "value", "10" );
-			MAX_SIMULATIONS = 10;
+			max_games = 10;
 		}
+		num_games = 0;
 		
 		// Start simulation
 		SIMULATION_ID = setInterval( function() {
-			NUMBER_OF_SIMULATIONS++;
-			var outcome = montyhall( SWITCH );
-			if( outcome == true )
-				CORRECT_GUESSES++;
+			if( montyhall( switch_door ) )
+				correct_guesses++;
 
-			if( NUMBER_OF_SIMULATIONS >= MAX_SIMULATIONS ) // end
+			if( ++num_games > max_games ) // end
 			{
-				$( "#results" ).append( "<tr><td>" + NUMBER_OF_SIMULATIONS + "</td><td>" + SWITCH.toString() + "</td><td>" + ( CORRECT_GUESSES / NUMBER_OF_SIMULATIONS * 100 ).toFixed( 0 ) + "%</td></tr>" );
-				$( "#start_test" ).removeAttr( "disabled" ); // prevent multiple clicks
+				// add results to table
+				$( "#results" ).append( "<tr><td>{0}</td><td>{1}</td><td>{2}%</td></tr>".format(
+					max_games,
+					switch_door.toString(),
+					( correct_guesses / max_games * 100 ).toFixed( 2 )
+				) );
+				
+				// clean up
+				$( "#start_test" ).removeAttr( "disabled" );
 				clearInterval( SIMULATION_ID );
 			}
 		}, 1 );
@@ -87,10 +97,11 @@ $( document ).ready( function() {
 		// Start monitoring
 		$( "#progress_indicator" ).css( "display", "block" );
 		PROGRESS_ID = setInterval( function() {
-			if( NUMBER_OF_SIMULATIONS < MAX_SIMULATIONS )
-				$( "#progress_bar" ).css( "width", ( NUMBER_OF_SIMULATIONS / MAX_SIMULATIONS * 100 ) + "%" );
+			if( num_games < max_games )
+				$( "#progress_bar" ).css( "width", ( num_games / max_games * 100 ) + "%" );
 			else
 			{
+				// clean up
 				$( "#progress_indicator" ).css( "display", "none" );
 				$( "#progress_bar" ).css( "width", "0%" );
 				clearInterval( PROGRESS_ID );
